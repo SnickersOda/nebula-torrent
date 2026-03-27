@@ -1,0 +1,79 @@
+{
+  "name": "nebula-torrent",
+  "productName": "NebulaTorrent",
+  "version": "1.0.0",
+  "description": "Premium AMOLED torrent client with glass UI",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "check": "node check-setup.js",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "build": {
+    "appId": "com.nebula.torrent",
+    "productName": "NebulaTorrent",
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "assets/icon.ico",
+      "fileAssociations": [
+        {
+          "ext": "torrent",
+          "name": "Torrent File",
+          "description": "BitTorrent File",
+          "icon": "assets/icon.ico",
+          "role": "Editor"
+        }
+      ],
+      "protocols": [
+        {
+          "name": "Magnet Link",
+          "schemes": [
+            "magnet"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "NebulaTorrent",
+      "perMachine": false,
+      "runAfterFinish": true,
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico",
+      "installerHeaderIcon": "assets/icon.ico",
+      "deleteAppDataOnUninstall": true
+    },
+    "files": [
+      "src/**/*",
+      "assets/**/*"
+    ],
+    "directories": {
+      "output": "dist"
+    }
+  },
+  "keywords": [
+    "torrent",
+    "electron",
+    "webtorrent"
+  ],
+  "author": "NebulaTorrent",
+  "license": "MIT",
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "webtorrent": "^1.9.7"
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1",
+    "sharp": "^0.34.5"
+  }
+}

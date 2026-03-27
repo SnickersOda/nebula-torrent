@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WebTorrent Test</title>
+  <style>
+    body { 
+      background: #000; 
+      color: #fff; 
+      font-family: monospace; 
+      padding: 20px;
+    }
+    .log { 
+      background: #111; 
+      padding: 10px; 
+      margin: 10px 0; 
+      border-radius: 5px;
+      border-left: 3px solid #a855f7;
+    }
+    button {
+      background: #a855f7;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    input {
+      background: #111;
+      color: white;
+      border: 1px solid #333;
+      padding: 10px;
+      border-radius: 5px;
+      width: 500px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🌌 WebTorrent Test</h1>
+  
+  <div>
+    <h3>Test Magnet Link (Big Buck Bunny - Legal Test File):</h3>
+    <input type="text" id="magnetInput" value="magnet:?xt=urn:btih:dd8255ecdc7ca55fb0bbf81323d87062db1f6d1c&dn=Big+Buck+Bunny&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.fastcast.nz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com">
+    <br><br>
+    <button onclick="testMagnet()">Test Magnet</button>
+    <button onclick="clearLogs()">Clear Logs</button>
+  </div>
+  
+  <div id="logs"></div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/webtorrent@latest/webtorrent.min.js"></script>
+  <script>
+    const client = new WebTorrent();
+    const logsDiv = document.getElementById('logs');
+    
+    function log(msg, color = '#a855f7') {
+      const div = document.createElement('div');
+      div.className = 'log';
+      div.style.borderLeftColor = color;
+      div.innerHTML = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      logsDiv.appendChild(div);
+      console.log(msg);
+    }
+    
+    function clearLogs() {
+      logsDiv.innerHTML = '';
+    }
+    
+    function testMagnet() {
+      const magnetUri = document.getElementById('magnetInput').value;
+      log('🚀 Adding magnet link...', '#3b82f6');
+      
+      client.add(magnetUri, (torrent) => {
+        log('✅ Torrent added: ' + (torrent.name || 'Loading...'), '#10b981');
+        log('InfoHash: ' + torrent.infoHash, '#06b6d4');
+        
+        torrent.on('metadata', () => {
+          log('📦 Metadata received: ' + torrent.name, '#8b5cf6');
+          log('Files: ' + torrent.files.length, '#8b5cf6');
+          torrent.files.forEach((file, i) => {
+            log(`  ${i + 1}. ${file.name} (${(file.length / 1024 / 1024).toFixed(2)} MB)`, '#8b5cf6');
+          });
+        });
+        
+        torrent.on('ready', () => {
+          log('🚀 Torrent ready, starting download', '#10b981');
+        });
+        
+        let lastUpdate = Date.now();
+        torrent.on('download', () => {
+          if (Date.now() - lastUpdate > 2000) {
+            log(`⬇️ Progress: ${(torrent.progress * 100).toFixed(1)}% | Speed: ${(torrent.downloadSpeed / 1024 / 1024).toFixed(2)} MB/s | Peers: ${torrent.numPeers}`, '#06b6d4');
+            lastUpdate = Date.now();
+          }
+        });
+        
+        torrent.on('done', () => {
+          log('✅ Download complete!', '#10b981');
+        });
+        
+        torrent.on('error', (err) => {
+          log('❌ Error: ' + err.message, '#ef4444');
+        });
+      });
+    }
+    
+    log('🌌 WebTorrent initialized', '#a855f7');
+    log('Version: ' + (WebTorrent.VERSION || 'unknown'), '#a855f7');
+  </script>
+</body>
+</html>
